@@ -1,4 +1,6 @@
 from agents import Agent, WebSearchTool, ModelSettings
+from google_search_agent import run_google_search
+
 
 INSTRUCTIONS = (
     "You are a research assistant. Given a search term, you search the web for that term and "
@@ -11,7 +13,7 @@ INSTRUCTIONS = (
 search_agent = Agent(
     name="Search agent",
     instructions=INSTRUCTIONS,
-    tools=[WebSearchTool(search_context_size="low")],
+    tools=[run_google_search],
     model="gpt-4o-mini",
     model_settings=ModelSettings(tool_choice="required"),
 )
