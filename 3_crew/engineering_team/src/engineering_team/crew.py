@@ -1,6 +1,13 @@
-from crewai import Agent, Crew, Process, Task
-from crewai.project import CrewBase, agent, crew, task
+from __future__ import annotations
 
+from crewai import Agent
+from crewai import Crew
+from crewai import Process
+from crewai import Task
+from crewai.project import agent
+from crewai.project import crew
+from crewai.project import CrewBase
+from crewai.project import task
 
 
 @CrewBase
@@ -23,33 +30,33 @@ class EngineeringTeam():
             config=self.agents_config['backend_engineer'],
             verbose=True,
             allow_code_execution=True,
-            code_execution_mode="safe",  # Uses Docker for safety
-            max_execution_time=500, 
-            max_retry_limit=3 
+            code_execution_mode='safe',  # Uses Docker for safety
+            max_execution_time=500,
+            max_retry_limit=3,
         )
-    
+
     @agent
     def frontend_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['frontend_engineer'],
             verbose=True,
         )
-    
+
     @agent
     def test_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['test_engineer'],
             verbose=True,
             allow_code_execution=True,
-            code_execution_mode="safe",  # Uses Docker for safety
-            max_execution_time=500, 
-            max_retry_limit=3 
+            code_execution_mode='safe',  # Uses Docker for safety
+            max_execution_time=500,
+            max_retry_limit=3,
         )
 
     @task
     def design_task(self) -> Task:
         return Task(
-            config=self.tasks_config['design_task']
+            config=self.tasks_config['design_task'],
         )
 
     @task
@@ -68,7 +75,7 @@ class EngineeringTeam():
     def test_task(self) -> Task:
         return Task(
             config=self.tasks_config['test_task'],
-        )   
+        )
 
     @crew
     def crew(self) -> Crew:
@@ -78,4 +85,5 @@ class EngineeringTeam():
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
+            max_rpm=8,
         )
