@@ -1,12 +1,17 @@
-from autogen_core import MessageContext, RoutedAgent, message_handler
-from autogen_agentchat.agents import AssistantAgent
-from autogen_agentchat.messages import TextMessage
-from autogen_ext.models.openai import OpenAIChatCompletionClient
-import messages
-from autogen_core import TRACE_LOGGER_NAME
+from __future__ import annotations
+
 import importlib
 import logging
+
+import messages
+from autogen_agentchat.agents import AssistantAgent
+from autogen_agentchat.messages import TextMessage
 from autogen_core import AgentId
+from autogen_core import message_handler
+from autogen_core import MessageContext
+from autogen_core import RoutedAgent
+from autogen_core import TRACE_LOGGER_NAME
+from autogen_ext.models.ollama import OllamaChatCompletionClient
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(TRACE_LOGGER_NAME)
@@ -33,7 +38,7 @@ class Creator(RoutedAgent):
 
     def __init__(self, name) -> None:
         super().__init__(name)
-        model_client = OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=1.0)
+        model_client = OllamaChatCompletionClient(model='llama3.2', temperature=1.0)
         self._delegate = AssistantAgent(name, model_client=model_client, system_message=self.system_message)
 
     def get_user_prompt(self):
@@ -41,22 +46,22 @@ class Creator(RoutedAgent):
             Respond only with the python code, no other text, and no markdown code blocks.\n\n\
             Be creative about taking the agent in a new direction, but don't change method signatures.\n\n\
             Here is the template:\n\n"
-        with open("agent.py", "r", encoding="utf-8") as f:
+        with open('agent.py', 'r', encoding='utf-8') as f:
             template = f.read()
-        return prompt + template   
-        
+        return prompt + template
+
 
     @message_handler
     async def handle_my_message_type(self, message: messages.Message, ctx: MessageContext) -> messages.Message:
         filename = message.content
-        agent_name = filename.split(".")[0]
-        text_message = TextMessage(content=self.get_user_prompt(), source="user")
+        agent_name = filename.split('.')[0]
+        text_message = TextMessage(content=self.get_user_prompt(), source='user')
         response = await self._delegate.on_messages([text_message], ctx.cancellation_token)
-        with open(filename, "w", encoding="utf-8") as f:
+        with open(filename, 'w', encoding='utf-8') as f:
             f.write(response.chat_message.content)
         print(f"** Creator has created python code for agent {agent_name} - about to register with Runtime")
         module = importlib.import_module(agent_name)
         await module.Agent.register(self.runtime, agent_name, lambda: module.Agent(agent_name))
         logger.info(f"** Agent {agent_name} is live")
-        result = await self.send_message(messages.Message(content="Give me an idea"), AgentId(agent_name, "default"))
+        result = await self.send_message(messages.Message(content='Give me an idea'), AgentId(agent_name, 'default'))
         return messages.Message(content=result.content)
