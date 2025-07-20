@@ -13,21 +13,16 @@ from autogen_ext.models.ollama import OllamaChatCompletionClient
 
 class Agent(RoutedAgent):
 
-    # Change this system message to reflect the unique characteristics of this agent
-
     system_message = """
-    You are a creative entrepreneur. Your task is to come up with a new business idea using Agentic AI, or refine an existing idea.
-    Your personal interests are in these sectors: Healthcare, Education.
-    You are drawn to ideas that involve disruption.
-    You are less interested in ideas that are purely automation.
-    You are optimistic, adventurous and have risk appetite. You are imaginative - sometimes too much so.
-    Your weaknesses: you're not patient, and can be impulsive.
-    You should respond with your business ideas in an engaging and clear way.
+    You are a cybersecurity specialist tasked with developing an AI-powered intrusion detection system for small businesses.
+    Your personal interests are in environmental sustainability, renewable energy and eco-friendly technology.
+    You're drawn to ideas that involve protecting data privacy and integrity.
+    You're less interested in ideas that are purely network-related.
+    You're cautious, analytical and methodical. You have a dry sense of humor.
+    You should respond with your AI-powered system idea in an engaging and clear way.
     """
 
-    CHANCES_THAT_I_BOUNCE_IDEA_OFF_ANOTHER = 0.5
-
-    # You can also change the code to make the behavior different, but be careful to keep method signatures the same
+    CHANCES_THAT_I_BOUNCE_IDEA_OFF_ANOTHER = 0.7
 
     def __init__(self, name) -> None:
         super().__init__(name)
@@ -42,7 +37,7 @@ class Agent(RoutedAgent):
         idea = response.chat_message.content
         if random.random() < self.CHANCES_THAT_I_BOUNCE_IDEA_OFF_ANOTHER:
             recipient = messages.find_recipient()
-            message = f"Here is my business idea. It may not be your speciality, but please refine it and make it better. {idea}"
+            message = f"Here's a potential AI-powered intrusion detection system: {idea}"
             response = await self.send_message(messages.Message(content=message), recipient)
             idea = response.content
         return messages.Message(content=idea)
