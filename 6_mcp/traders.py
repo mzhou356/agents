@@ -38,7 +38,7 @@ google_api_key = os.getenv('gemini_api_key')
 GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/'
 # OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
-MAX_TURNS = 10
+MAX_TURNS = 8
 
 # openrouter_client = AsyncOpenAI(base_url=OPENROUTER_BASE_URL, api_key=openrouter_api_key)
 # deepseek_client = AsyncOpenAI(base_url=DEEPSEEK_BASE_URL, api_key=deepseek_api_key)
