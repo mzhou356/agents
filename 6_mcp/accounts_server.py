@@ -1,7 +1,9 @@
-from mcp.server.fastmcp import FastMCP
-from accounts import Account
+from __future__ import annotations
 
-mcp = FastMCP("accounts_server")
+from accounts import Account
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP('accounts_server')
 
 @mcp.tool()
 async def get_balance(name: str) -> float:
@@ -56,15 +58,25 @@ async def change_strategy(name: str, strategy: str) -> str:
     """
     return Account.get(name).change_strategy(strategy)
 
-@mcp.resource("accounts://accounts_server/{name}")
+@mcp.tool()
+async def get_strategy(name: str) -> str:
+    """At your discretion, if you choose to, call this to get your current investment strategy.
+
+    Args:
+        name: The name of the account holder
+        strategy: The new strategy for the account
+    """
+    return Account.get(name).get_strategy()
+
+@mcp.resource('accounts://accounts_server/{name}')
 async def read_account_resource(name: str) -> str:
     account = Account.get(name.lower())
     return account.report()
 
-@mcp.resource("accounts://strategy/{name}")
+@mcp.resource('accounts://strategy/{name}')
 async def read_strategy_resource(name: str) -> str:
     account = Account.get(name.lower())
     return account.get_strategy()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     mcp.run(transport='stdio')
